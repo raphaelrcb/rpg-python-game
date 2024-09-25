@@ -19,15 +19,28 @@ while running:
     print("you chose: ", index)
 
     if index == 0:
-        dmg = player.generate_demage()
+        dmg = player.generate_damage()
         enemy.take_damage(dmg)
         print("You attacked for ", dmg, "points of damage. Enemy HP: ", enemy.get_hp())
 
+    if index == 1:
+        print("you chose: ", index)
+        player.choose_magic()
+        magic_index = int(input("Choose Spell: ")) - 1
+        print("you chose:", player.get_spell_name(magic_index))
+
+        magic_dmg = player.generate_spell_damage(magic_index)
+        enemy.take_damage(magic_dmg)
+        player.reduce_mp(player.get_spell_mp_cost(magic_index))
+        print("You attacked for ", magic_dmg, "points of damage. Enemy HP: ", enemy.get_hp())
+
     enemy_choice = 0
-    enemy_dmg = enemy.generate_demage()
+    enemy_dmg = enemy.generate_damage()
     player.take_damage(enemy_dmg)
     print("Enemy attacks for ", enemy_dmg, "points of damage. Player HP: ", player.get_hp())
+    
 
+  
 
 
 
