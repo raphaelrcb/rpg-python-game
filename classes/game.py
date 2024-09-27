@@ -25,7 +25,7 @@ class Person:
         self.atk = atk
         self.df = df
         self.magic = magic
-        self.item = items
+        self.items = items
         self.actions = ["Attack", "Magic", "Items"]
 
     def generate_damage(self):
@@ -79,6 +79,6 @@ class Person:
     def choose_item(self):
         i = 1        
         print(bcolors.OKGREEN + bcolors.BOLD + "ITEMS" + bcolors.ENDC)
-        for item in self.item:
-            print("\t" + str(i) + " -", item.name + ":\t", item.description, " (x5)")
+        for item in self.items:
+            print("\t" + str(i) + " -", item["item"].name + ": ", item["item"].description, " (x"+str(item["quantity"])  +")")
             i += 1
