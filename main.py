@@ -2,6 +2,18 @@ from classes.game import Person, bcolors
 from classes.magic import Spell
 from classes.inventory import Item
 
+print("\n\n")
+print("NAME                HP                                 | MP")
+print("                     _________________________          __________")
+print(bcolors.BOLD + "Valos:   460/460    |" + bcolors.OKGREEN + "█████████████████████████"+ bcolors.ENDC + bcolors.BOLD +"|  65/65 |"+ bcolors.OKBLUE +"██████████" + bcolors.ENDC + bcolors.BOLD + "|" + bcolors.ENDC)
+
+print("                     _________________________          __________")
+print("Valos:   460/460    |█████████████████████████|  65/65 |██████████|")
+
+print("                     _________________________          __________")
+print("Valos:   460/460    |█████████████████████████|  65/65 |██████████|")
+print("\n\n")
+
 #Creating Spells
 fireball = Spell("Fireball", 10, 100, "Evocation")
 thunderbolt = Spell("Thunderbolt", 12, 120, "Evocation")
@@ -97,7 +109,11 @@ while running:
         
         elif item.type == "attack":
             enemy.take_damage(item.prop)
-            print(bcolors.FAIL + "\n" + item.name + " Deals", item.prop, "points of damage" + bcolors.ENDC) 
+            print(bcolors.FAIL + "\n" + item.name + " Deals", item.prop, "points of damage" + bcolors.ENDC)
+    
+    else: 
+        print("quit")
+        quit()
     
 
     enemy_choice = 0
