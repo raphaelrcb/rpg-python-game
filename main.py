@@ -1,6 +1,7 @@
 from classes.game import Person, bcolors
 from classes.magic import Spell
 from classes.inventory import Item
+import random
 
 #Creating Spells
 fireball = Spell("Fireball", 15, 300, "Evocation")
@@ -14,13 +15,13 @@ healing_touch = Spell("Healing Touch", 22, 1000, "Divine")
 player_spells = [fireball, thunderbolt, blizzard, meteor, healing_touch, healing_word]
 
 # Create some Items
-potion = Item("Potion of Healing", "potion", "Heals 50 HP", 600)
-greater_potion = Item("Greater Potion", "potion", "Heals 100 HP", 1000)
-superior_potion = Item("Superior Potion", "potion", "Heals 500 HP", 2000)
+potion = Item("Potion of Healing", "potion", "Heals 600 HP", 600)
+greater_potion = Item("Greater Potion", "potion", "Heals 1000 HP", 1000)
+superior_potion = Item("Superior Potion", "potion", "Heals 2000 HP", 2000)
 elixir = Item("Elixir", "elixir", "Fully restores HP/MP of one party member", 99999)
-full_elixir = Item("Fill Elixir", "elixir", "Fully restores party's HP/MP", 99999)
-throwing_dagger = Item("Throwing Dagger", "attack", "Deals 50 damage", 500)
-oil_bomb = Item("Oil Bomb", "attack", "Deals 500 damage", 3000)
+full_elixir = Item("Full Elixir", "elixir", "Fully restores party's HP/MP", 99999)
+throwing_dagger = Item("Throwing Dagger", "attack", "Deals 500 damage", 500)
+oil_bomb = Item("Oil Bomb", "attack", "Deals 3000 damage", 3000)
 
 player_items = [potion, greater_potion, throwing_dagger, elixir]
 
@@ -46,9 +47,8 @@ i = 0
 print(bcolors.FAIL + bcolors.BOLD + "AN ENEMY ATTACKS!" + bcolors.ENDC)
 
 while running:
-    print(bcolors.BOLD + bcolors.HEADER + "========================="   + bcolors.ENDC)
 
-    print("\n\n")
+    print(bcolors.BOLD + bcolors.HEADER + "=========================================================================-"   + bcolors.ENDC)
     print("NAME                   HP                                 |    MP")
     for player in players:
         player.get_stats()
@@ -86,8 +86,13 @@ while running:
                 continue
 
             player.reduce_mp(spell.cost)
-            enemy.take_damage(magic_dmg)
-            print("\n"+ spell.name + " deals " + str(magic_dmg) + " points of damage\n")
+            if spell.type == "Evocation":
+                enemy.take_damage(magic_dmg)
+                print("\n"+ spell.name + " deals " + str(magic_dmg) + " points of damage\n")
+            elif spell.type == "Divine": 
+                player.take_damage(-magic_dmg)
+                print("\n"+ spell.name + " heals " + str(magic_dmg) + " points of damage\n")
+
         
         elif index == 2:
             player.choose_item()
@@ -109,20 +114,30 @@ while running:
                 print(bcolors.OKGREEN + "\n" + item.name + " heals for", item.prop, "points of damage" + bcolors.ENDC) 
             
             elif item.type == "elixir":
-                player.hp = player.maxhp
-                player.mp = player.maxmp
-                print(bcolors.OKGREEN + "\n" + item.name + " Fully restores HP/MP"+ bcolors.ENDC) 
+
+                if item.name == "Full Elixir":
+                    for i in players:
+                        i.hp = i.maxhp
+                        i.mp = i.maxmp
+                        print(bcolors.OKGREEN + "\n" + item.name + " Fully restores party's HP/MP"+ bcolors.ENDC)
+                else:
+                    player.hp = player.maxhp
+                    player.mp = player.maxmp
+                    print(bcolors.OKGREEN + "\n" + item.name + " Fully restores yours HP/MP"+ bcolors.ENDC) 
             
             elif item.type == "attack":
                 enemy.take_damage(item.prop)
                 print(bcolors.FAIL + "\n" + item.name + " Deals", item.prop, "points of damage" + bcolors.ENDC)
-        
+
+            print(bcolors.BOLD + bcolors.HEADER + "=========================================================================-"   + bcolors.ENDC)        
         else: 
             print("quit")
             quit()
     
 
-    enemy_choice = 0
+##    enemy_choice = 0
+    target = random.randrange(0,len(players))
+    print("========= ", len(players))
     enemy_dmg = enemy.generate_damage()
-    player1.take_damage(enemy_dmg)
-    print(bcolors.FAIL + bcolors.BOLD + "Enemy attacks for ", enemy_dmg, "points of damage" + bcolors.ENDC)
+    players[target].take_damage(enemy_dmg)
+    print(bcolors.FAIL + bcolors.BOLD + "Enemy attacks " + players[target].name + " for ", enemy_dmg, "points of damage" + bcolors.ENDC)
