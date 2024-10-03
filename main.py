@@ -13,7 +13,7 @@ healing_word = Spell("Healing Word", 15, 400, "Divine")
 healing_touch = Spell("Healing Touch", 22, 1000, "Divine")
 
 player_spells = [fireball, thunderbolt, blizzard, meteor, healing_touch, healing_word]
-
+enemy_spells = [fireball, healing_word, meteor]
 # Create some Items
 potion = Item("Potion of Healing", "potion", "Heals 600 HP", 600)
 greater_potion = Item("Greater Potion", "potion", "Heals 1000 HP", 1000)
@@ -34,13 +34,13 @@ player_items = [{"item": potion, "quantity": 7},
 
 
 # Instantiate People 
-player1 = Person("Silvar: ", 400, 75, 170, 34, player_spells, player_items)
-player2 = Person("Lázaro: ", 200, 99, 150, 34, player_spells, player_items)
-player3 = Person("Gwill:  ", 600, 40, 250, 34, player_spells, player_items)
+player1 = Person("Silvar: ", 2000, 75, 170, 34, player_spells, player_items)
+player2 = Person("Lázaro: ", 1000, 99, 150, 34, player_spells, player_items)
+player3 = Person("Gwill:  ", 4000, 40, 250, 34, player_spells, player_items)
 
-enemy1 = Person("Diabin   ", 1250, 130, 560, 325, [], [])
-enemy2 = Person("Diabrete ", 10000, 65, 450, 25, [], [])
-enemy3 = Person("Diabin   ", 1250, 130, 560, 325, [], [])
+enemy1 = Person("Diabin   ", 1250, 130, 560, 325, enemy_spells, [])
+enemy2 = Person("Diabrete ", 10000, 65, 450, 25, enemy_spells, [])
+enemy3 = Person("Diabin   ", 1250, 130, 560, 325, enemy_spells, [])
 
 players = [player1, player2, player3]
 enemies = [enemy1, enemy2, enemy3]
@@ -91,12 +91,11 @@ while running:
             magic_dmg = spell.generate_damage()
 
             current_mp = player.get_mp()
-
             if spell.cost > current_mp:
                 print("\nNot enough MP\n")
                 continue
-
             player.reduce_mp(spell.cost)
+
             if spell.type == "Evocation":
                 enemy = player.choose_target(enemies)
                 enemies[enemy].take_damage(magic_dmg)
@@ -153,31 +152,64 @@ while running:
             print("quit")
             quit()
     
-
-##    enemy_choice = 0
-    target = random.randrange(0,len(players))
-    enemy_dmg = enemies[0].generate_damage()
-    players[target].take_damage(enemy_dmg)
-    print(bcolors.FAIL + bcolors.BOLD + "Enemy attacks " + players[target].name + " for ", enemy_dmg, "points of damage" + bcolors.ENDC)
-
     defeated_enemies = 0 
     defeated_players = 0
 
+    # Condição de Vitória
     for enemy in enemies: 
         if enemy.get_hp() <= 0:
             defeated_enemies+= 1
-            #enemies.remove(enemy)
-
-    if defeated_enemies == 2:
+            
+    if defeated_enemies == 2:   
         print(bcolors.BACKGROUND + bcolors.BOLD + bcolors.UNDERLINE + bcolors.HEADER + "\n\nY O U     W I N !!!!!!!!!!!!!!!!!\n\n" + bcolors.ENDC)
         running = False
 
+    # Condição de Derrota
     for player in players: 
         if player.get_hp() <= 0:
             defeated_players+= 1
-
+        
+    
     if defeated_players == 2:
         print(bcolors.BACKGROUND + bcolors.BOLD + bcolors.HEADER + "             W A S T E D            " )
         print("             X   X           " )
         print("               0              " + bcolors.ENDC)
         running = False
+
+    # Turno do Inimigo
+    for enemy in enemies:
+        enemy_choice = random.randrange(0,3)
+        target = random.randrange(0,len(players))
+        if enemy_choice == 0:
+            # Ataque
+            enemy_dmg = enemy.generate_damage()
+            players[target].take_damage(enemy_dmg)
+            print(bcolors.FAIL + bcolors.BOLD + enemy.name +" attacks " + players[target].name + " for ", enemy_dmg, "points of damage" + bcolors.ENDC)
+        
+        elif enemy_choice == 1: 
+            # Magia
+            magic_choice = random.randrange(0, len(enemy.magic))
+            spell = enemy.magic[magic_choice]
+            magic_dmg = spell.generate_damage()
+
+            current_mp = enemy.get_mp()
+            if spell.cost > current_mp:
+                print("\nNot enough MP\n")
+                continue
+            player.reduce_mp(spell.cost)
+
+            if spell.type == "Evocation":
+                players[target].take_damage(magic_dmg)
+                print("\n"+ enemy.name + "Conjures " + bcolors.BOLD + spell.name + " and deals " + str(magic_dmg) + " points of damage to " + players[target].name + bcolors.ENDC)
+                if players[target].get_hp() == 0:
+                    print(bcolors.BOLD + bcolors.BACKGROUND + bcolors.FAIL + players[target].name + " has been WASTED!" + bcolors.ENDC)
+                    del players[target]
+            elif spell.type == "Divine": 
+                enemy.take_damage(-magic_dmg)
+                if (enemy.get_hp() > enemy.get_max_mp()):
+                    enemy.mp = enemy.maxmp
+                print("\n" + enemy.name + "Conjures " + bcolors.BOLD + spell.name + " and heals " + str(magic_dmg) + " points of damage" + bcolors.ENDC)
+            
+        elif enemy_choice == 2:
+            print(enemy.name + "tentou usar um item")
+
