@@ -71,6 +71,17 @@ class Person:
         for item in self.actions:
             print("    " + str(i) + " -", item)
             i += 1
+    
+    def choose_target(self, enemies):
+        i = 1
+        print("\n" + bcolors.BOLD + "    TARGET: " + bcolors.ENDC)
+        for enemy in enemies:
+            print("        " + str(i) + "- " + enemy.name)
+            i+=1
+        choice = int(input(print("    Choose Target: "))) - 1
+        return choice             
+
+
 
     def choose_magic(self):
         i = 1        
@@ -99,7 +110,7 @@ class Person:
         
         hp_bar = self.calc_bar(70, self.maxhp, self.hp, "enemy")
         hp_string = self.fix_string(11, str(self.hp) +"/" + str(self.maxhp))
-        print("                        ______________________________________________________________________")
+        print("                       ______________________________________________________________________")
         print(bcolors.BOLD + self.name + hp_string +"  |" + hp_bar + bcolors.BOLD +"|  " + bcolors.ENDC)
 
     

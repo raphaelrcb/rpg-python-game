@@ -30,17 +30,21 @@ player_items = [{"item": potion, "quantity": 7},
                 {"item": elixir, "quantity": 3},
                 {"item": full_elixir, "quantity": 2},
                 {"item": throwing_dagger, "quantity": 30},
-                {"item": oil_bomb, "quantity": 1}]
+                {"item": oil_bomb, "quantity": 15}]
 
 
 # Instantiate People 
-player1 = Person("Silvar: ", 4000, 75, 170, 34, player_spells, player_items)
-player2 = Person("Lázaro: ", 2000, 99, 150, 34, player_spells, player_items)
-player3 = Person("Gwill:  ", 6000, 40, 250, 34, player_spells, player_items)
+player1 = Person("Silvar: ", 400, 75, 170, 34, player_spells, player_items)
+player2 = Person("Lázaro: ", 200, 99, 150, 34, player_spells, player_items)
+player3 = Person("Gwill:  ", 600, 40, 250, 34, player_spells, player_items)
+
+enemy1 = Person("Diabin   ", 1250, 130, 560, 325, [], [])
+enemy2 = Person("Diabrete ", 10000, 65, 450, 25, [], [])
+enemy3 = Person("Diabin   ", 1250, 130, 560, 325, [], [])
 
 players = [player1, player2, player3]
+enemies = [enemy1, enemy2, enemy3]
 
-enemy = Person("Vermelho: ", 10000, 65, 450, 25, [], [])
 
 running = True
 i = 0
@@ -54,7 +58,9 @@ while running:
         player.get_stats()
     print("\n")
 
-    enemy.get_enemy_stats()
+    for enemy in enemies:
+        enemy.get_enemy_stats()
+
     print("\n")
 
     for player in players:
@@ -64,10 +70,15 @@ while running:
         print("you chose: ", index)
         print("\n")
 
-        if index == 0:
+        if index == 0: 
             dmg = player.generate_damage()
-            enemy.take_damage(dmg)
-            print(bcolors.FAIL + "You attacked for ", dmg, "points of damage. Enemy HP: ", enemy.get_hp(), bcolors.ENDC)
+            enemy = player.choose_target(enemies)
+            enemies[enemy].take_damage(dmg)
+            print(bcolors.FAIL + "You attacked " + enemies[enemy].name + " for ", dmg, "points of damage. Enemy HP: " + bcolors.ENDC)
+
+            if enemies[enemy].get_hp() == 0:
+                print(bcolors.BOLD + bcolors.BACKGROUND + bcolors.FAIL + enemies[enemy].name + " has been defeated!" + bcolors.ENDC)
+                del enemies[enemy]
 
         elif index == 1:
             print("\n", player.get_mp(), "/", player.get_max_mp(), " MP")
@@ -87,11 +98,15 @@ while running:
 
             player.reduce_mp(spell.cost)
             if spell.type == "Evocation":
-                enemy.take_damage(magic_dmg)
-                print("\n"+ spell.name + " deals " + str(magic_dmg) + " points of damage\n")
+                enemy = player.choose_target(enemies)
+                enemies[enemy].take_damage(magic_dmg)
+                print("\n"+ bcolors.BOLD + spell.name + " deals " + str(magic_dmg) + " points of damage to " + enemies[enemy].name + bcolors.ENDC)
+                if enemies[enemy].get_hp() == 0:
+                    print(bcolors.BOLD + bcolors.BACKGROUND + bcolors.FAIL + enemies[enemy].name + " has been defeated!" + bcolors.ENDC)
+                    del enemies[enemy]
             elif spell.type == "Divine": 
                 player.take_damage(-magic_dmg)
-                print("\n"+ spell.name + " heals " + str(magic_dmg) + " points of damage\n")
+                print("\n"+ bcolors.BOLD + spell.name + " heals " + str(magic_dmg) + " points of damage" + bcolors.ENDC)
 
         
         elif index == 2:
@@ -126,8 +141,12 @@ while running:
                     print(bcolors.OKGREEN + "\n" + item.name + " Fully restores yours HP/MP"+ bcolors.ENDC) 
             
             elif item.type == "attack":
-                enemy.take_damage(item.prop)
-                print(bcolors.FAIL + "\n" + item.name + " Deals", item.prop, "points of damage" + bcolors.ENDC)
+                enemy = player.choose_target(enemies)
+                enemies[enemy].take_damage(item.prop)
+                print(bcolors.FAIL + "\n" + item.name + " Deals", item.prop, "points of damage to " + enemies[enemy].name + bcolors.ENDC)
+                if enemies[enemy].get_hp() <= 0:
+                    print(bcolors.BOLD + bcolors.BACKGROUND + bcolors.FAIL + enemies[enemy].name + " has been defeated!" + bcolors.ENDC)
+                    del enemies[enemy]
 
             print(bcolors.BOLD + bcolors.HEADER + "=========================================================================-"   + bcolors.ENDC)        
         else: 
@@ -137,7 +156,28 @@ while running:
 
 ##    enemy_choice = 0
     target = random.randrange(0,len(players))
-    print("========= ", len(players))
-    enemy_dmg = enemy.generate_damage()
+    enemy_dmg = enemies[0].generate_damage()
     players[target].take_damage(enemy_dmg)
     print(bcolors.FAIL + bcolors.BOLD + "Enemy attacks " + players[target].name + " for ", enemy_dmg, "points of damage" + bcolors.ENDC)
+
+    defeated_enemies = 0 
+    defeated_players = 0
+
+    for enemy in enemies: 
+        if enemy.get_hp() <= 0:
+            defeated_enemies+= 1
+            #enemies.remove(enemy)
+
+    if defeated_enemies == 2:
+        print(bcolors.BACKGROUND + bcolors.BOLD + bcolors.UNDERLINE + bcolors.HEADER + "\n\nY O U     W I N !!!!!!!!!!!!!!!!!\n\n" + bcolors.ENDC)
+        running = False
+
+    for player in players: 
+        if player.get_hp() <= 0:
+            defeated_players+= 1
+
+    if defeated_players == 2:
+        print(bcolors.BACKGROUND + bcolors.BOLD + bcolors.HEADER + "             W A S T E D            " )
+        print("             X   X           " )
+        print("               0              " + bcolors.ENDC)
+        running = False
